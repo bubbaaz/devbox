@@ -12,11 +12,12 @@
         nixpkgs.unzip
         nixpkgs.ripgrep
         nixpkgs.fd
-	nixpkgs.eza    # Add eza
         nixpkgs.yazi   # Add yazi
-	nixpkgs.fzf
-	nixpkgs.bat
-	nixpkgs.lolcat # Add eza
+        nixpkgs.eza    # Add eza
+      	nixpkgs.fzf
+      	nixpkgs.bat
+      	nixpkgs.lolcat # Add eza
+        nixpkgs.autin
       ];
 
       shellHook = ''
