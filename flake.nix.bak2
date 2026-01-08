@@ -1,0 +1,39 @@
+{
+
+description = "My Multi-Platform Dev Environment";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # 1. We add flake-utils to help us handle multiple systems easily
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  # 2. We add flake-utils to the arguments here
+  outputs = { self, nixpkgs, flake-utils }:
+    # 3. This function "loops" over standard systems (macOS, Linux, etc.)
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        # Now 'pkgs' is automatically correct for whatever machine you are on!
+        pkgs = nixpkgs.legacyPackages.${system};
+      in {
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            neovim git gnumake unzip ripgrep fd
+            yazi eza fzf bat lolcat atuin zoxide
+          ];
+
+          shellHook = ''
+            # Use zsh if available, otherwise fallback to bash
+            if [ -n "$ZSH_VERSION" ]; then
+              eval "$(atuin init zsh)"
+            else
+              eval "$(atuin init bash)"
+            fi
+
+            export XDG_CONFIG_HOME="$PWD/.config/nvim"
+            echo "✨ Environment Loaded (${system})!" | ${pkgs.lolcat}/bin/lolcat
+          '';
+        };
+      }
+    );
+}

@@ -1,0 +1,70 @@
+{
+
+  description = "My Development Environment";
+
+  # Inputs define where we pull our software from.
+  inputs = {
+    # Nixpkgs is the primary repository of packages.
+    # 'nixpkgs-unstable' is actually the standard "rolling" channel.
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  };
+
+  # Outputs define what this flake produces (like a dev shell).
+  outputs = { self, nixpkgs }:
+    let
+      # 'system' defines the architecture. aarch64-darwin is Apple Silicon.
+      system = "aarch64-darwin";
+
+      # 'pkgs' imports the actual package collection for our specific system.
+      pkgs = nixpkgs.legacyPackages.${system};
+
+      # This is a string containing shell commands that run when you enter the shell.
+      # We will pass this to the 'shellHook' argument below.
+      myShellConfig = ''
+        # Set Neovim to look for config and data inside the current folder
+        export XDG_CONFIG_HOME="$PWD/.config/nvim"
+        export XDG_DATA_HOME="$PWD/.local/share/nvim"
+        export XDG_STATE_HOME="$PWD/.local/state/nvim"
+
+        # Atuin setup: History search on steroids
+        if command -v atuin >/dev/null 2>&1; then
+          eval "$(atuin init bash)"
+          export ATUIN_FUZZY_SEARCH=true
+          export ATUIN_SYNC_PREVIEW=true
+          export ATUIN_HISTORY="always"
+          echo "✨ Atuin is ready! Try Ctrl+R to search history"
+        else
+          echo "⚠️ Atuin binary not found in PATH"
+        fi
+
+        # Fun greeting
+        echo "Development environment loaded!" | ${pkgs.lolcat}/bin/lolcat
+      '';
+    in {
+      # This defines the default development shell.
+      # Run it with: nix develop
+      devShells.${system}.default = pkgs.mkShell {
+        
+        # buildInputs are the packages added to your shell's PATH.
+        buildInputs = with pkgs; [
+          neovim
+          git
+          gnumake
+          unzip
+          ripgrep
+          fd
+          yazi
+          eza
+          fzf
+          bat
+          lolcat
+          autojump
+          zoxide
+          atuin
+        ];
+
+        # shellHook runs the script we defined in the 'let' block above.
+        shellHook = myShellConfig;
+      };
+    };
+}

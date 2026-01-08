@@ -1,0 +1,28 @@
+{
+"$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/main/.schema/devbox.schema.json",
+  "packages": [
+    "neovim@latest",
+    "git@latest",
+    "gnumake@latest",
+    "unzip@latest",
+    "ripgrep@latest",
+    "fd@latest",
+    "yazi@latest",
+    "eza@latest",
+    "fzf@latest",
+    "bat@latest",
+    "lolcat@latest",
+    "atuin@latest",
+    "zoxide@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "if [ -n \"$ZSH_VERSION\" ]; then eval \"$(atuin init zsh)\"; fi",
+      "export XDG_CONFIG_HOME=\"$PWD/.config/nvim\"",
+      "echo \"✨ Devbox Environment Loaded!\" | lolcat"
+    ],
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    }
+  }
+}
