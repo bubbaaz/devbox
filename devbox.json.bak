@@ -1,0 +1,19 @@
+{
+  "packages": [
+    "neovim@latest",
+    "git@latest",
+    "gnumake@latest",
+    "unzip@latest",
+    "ripgrep@latest",
+    "fd@latest",
+    "eza@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "export XDG_CONFIG_HOME=\"$PWD/.devbox/nvim/config\"",
+      "export XDG_DATA_HOME=\"$PWD/.devbox/nvim/data\"",
+      "export XDG_STATE_HOME=\"$PWD/.devbox/nvim/state\"",
+      "if [ ! -d \"$XDG_CONFIG_HOME/nvim\" ]; then git clone https://github.com/nvim-lua/kickstart.nvim.git \"$XDG_CONFIG_HOME/nvim\"; fi"
+    ]
+  }
+}
