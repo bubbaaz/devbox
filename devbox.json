@@ -16,7 +16,10 @@
     "lazygit@latest",
     "imagemagick@latest",
     "tree-sitter@latest",
-    "python3@latest"
+    "python3@latest",
+    "atuin@latest",
+    "lolcat@latest",
+    "tmux@latest"
   ],
   "shell": {
     "init_hook": [],
