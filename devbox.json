@@ -1,76 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/main/.schema/devbox.schema.json",
-  "packages": [
-    "neovim@latest",
-    "git@latest",
-    "gnumake@latest",
-    "gcc@latest",
-    "ripgrep@latest",
-    "fd@latest",
-    "fzf@latest",
-    "lua@latest",
-    "nodejs@latest",
-    "lazygit@latest",
-    "imagemagick@latest",
-    "tree-sitter@latest",
-    "python3@latest"
+  "include": [
+    "./plugins/nvim/plugin.json"
   ],
+  "packages": [],
   "shell": {
-    "init_hook": [
-      // ───────────────────────────────────────────────────────────────
-      // Make Neovim config & data project-local (reproducible & isolated)
-      // ───────────────────────────────────────────────────────────────
-      "export XDG_CONFIG_HOME=\"$PWD/.config\"",
-      "export XDG_DATA_HOME=\"$PWD/.local/share\"",
-      "export XDG_CACHE_HOME=\"$PWD/.cache\"",
-
-      // Create required directories if they don't exist
-      "mkdir -p \"$XDG_CONFIG_HOME/nvim\"",
-      "mkdir -p \"$XDG_DATA_HOME/nvim\"",
-      "mkdir -p \"$XDG_CACHE_HOME/nvim\"",
-
-      // ───────────────────────────────────────────────────────────────
-      // ONE-TIME LAZYVIM SETUP: Only run if init.lua doesn't exist yet
-      // This prevents overwriting your custom config on every shell start
-      // ───────────────────────────────────────────────────────────────
-      "if [ ! -f \"$XDG_CONFIG_HOME/nvim/init.lua\" ]; then",
-      "  echo \"Setting up LazyVim starter for the first time...\"",
-      "  cat <<'EOF' > \"$XDG_CONFIG_HOME/nvim/init.lua\"",
-      "-- bootstrap lazy.nvim",
-      "local lazypath = vim.fn.stdpath(\"data\") .. \"/lazy/lazy.nvim\"",
-      "if not (vim.uv or vim.loop).fs_stat(lazypath) then",
-      "  vim.fn.system({",
-      "    \"git\",",
-      "    \"clone\",",
-      "    \"--filter=blob:none\",",
-      "    \"https://github.com/folke/lazy.nvim.git\",",
-      "    \"--branch=stable\",",
-      "    lazypath,",
-      "  })",
-      "end",
-      "vim.opt.rtp:prepend(lazypath)",
-      "",
-      "-- Load LazyVim core + your custom plugins",
-      "require(\"lazy\").setup({",
-      "  spec = {",
-      "    -- Core LazyVim (provides defaults, auto-loads lua/config/*, etc.)",
-      "    { \"LazyVim/LazyVim\", import = \"lazyvim.plugins\" },",
-      "    -- Your personal plugins (in .config/nvim/lua/plugins/)",
-      "    { import = \"plugins\" },",
-      "  },",
-      "  install = { colorscheme = { \"tokyonight\", \"habamax\" } },",
-      "  checker = { enabled = true, notify = false },",
-      "  change_detection = { notify = false },",
-      "})",
-      "EOF",
-      "  echo \"LazyVim starter created! Run 'nvim' to finish first-time install\"",
-      "else",
-      "  echo \"Existing Neovim config found — skipping overwrite\"",
-      "fi"
-    ],
-    "scripts": {
-      "nvim-update": "nvim --headless \"+Lazy! sync\" +qa",
-      "nvim-health": "nvim --headless \"+checkhealth\" +qa"
-    }
+    "init_hook": [],
+    "scripts": {}
   }
 }
