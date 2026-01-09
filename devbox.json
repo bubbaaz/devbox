@@ -3,7 +3,21 @@
   "include": [
     "./plugins/nvim/plugin.json"
   ],
-  "packages": [],
+  "packages": [
+    "neovim@latest",
+    "git@latest",
+    "gnumake@latest",
+    "gcc@latest",
+    "ripgrep@latest",
+    "fd@latest",
+    "fzf@latest",
+    "lua@latest",
+    "nodejs@latest",
+    "lazygit@latest",
+    "imagemagick@latest",
+    "tree-sitter@latest",
+    "python3@latest"
+  ],
   "shell": {
     "init_hook": [],
     "scripts": {}

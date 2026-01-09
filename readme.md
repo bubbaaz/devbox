@@ -1,57 +1,94 @@
-Setup Devbox
+# Devbox Development Environment
 
-# Devbox + Direnv + Atuin Setup Guide
+This project uses [Devbox](https://www.jetpack.io/devbox) to create a reproducible, portable, and isolated development environment. It features a custom **Project-Local NeoVim** setup, ensuring that your editor configuration is consistent and contained entirely within this directory.
 
-### 1. Install System Dependencies
+## 🏗 Architecture
 
-Run this on the new Mac to install the "engines" that manage your environments:
-brew install devbox direnv atuin
+The project is split into two main responsibilities: **Provisioning** (installing tools) and **Configuration** (setting them up).
 
-### 2. Configure Global Shell (~/.zshrc)
+```mermaid
+graph TD
+    subgraph "Provisioning (devbox.json)"
+        Devbox[Devbox] -->|Installs| Packages[Packages\n(neovim, git, nodejs, etc.)]
+        Devbox -->|Includes| Plugin[plugins/nvim/plugin.json]
+    end
 
-Add these EXACT lines to the absolute bottom of your ~/.zshrc file.
-The order is critical: Direnv must load the path before Atuin initializes.
+    subgraph "Configuration (plugins/nvim/)"
+        Plugin -->|Defines| Hooks[Shell Hooks & Scripts]
+        Hooks -->|Executes| Setup[setup.sh]
+        Setup -->|Sets| EnvVars[XDG Environment Vars]
+        Setup -->|Deploys| Config[init.lua]
+    end
 
-# --- Global Hooks ---
+    EnvVars -->|Isolates| Nvim[NeoVim Instance]
+    Config -->|Configures| Nvim
+```
 
-eval "$(direnv hook zsh)"
-eval "$(atuin init zsh)"
+### 1. `devbox.json` (The Provisioner)
+Located at the project root, this file defines the **tools** required for the project.
+- **Packages**: Lists `neovim`, `git`, `ripgrep`, `nodejs`, etc.
+- **Includes**: Imports `./plugins/nvim/plugin.json` to bring in the NeoVim-specific logic.
 
-### 3. Initialize the Project Folder
+### 2. `plugins/nvim/` (The Configurator)
+This directory acts as a local Devbox plugin. It encapsulates all the logic needed to verify and configure the editor.
+- **`plugin.json`**: Defines shell hooks (`init_hook`) and convenience scripts (`nvim-health`).
+- **`setup.sh`**: Runs when you enter the shell. It:
+    1.  Sets `XDG_CONFIG_HOME` and `XDG_DATA_HOME` to local folders (`.config/`, `.local/`).
+    2.  Ensures required directories exist.
+    3.  Copies the bootstrap `init.lua` if it's missing.
+- **`init.lua`**: The entry point for the NeoVim configuration (bootstrapping `lazy.nvim` and `LazyVim`).
 
-Inside your project directory, create/update these two files:
+## 🚀 How It Works
 
---- File: devbox.json ---
-{
-"packages": [
-"neovim@latest",
-"atuin@latest",
-"lolcat@latest"
-],
-"shell": {
-"init_hook": [
-"if [ -n "$ZSH_VERSION" ]; then eval "$(atuin init zsh)"; fi",
-"export XDG_CONFIG_HOME="$PWD/.config/nvim"",
-"echo "✨ Devbox Environment Loaded!" | lolcat"
-]
-}
-}
+When you enter the directory (via `cd` with `direnv` or `devbox shell`), the following sequence occurs:
 
---- File: .envrc ---
+```mermaid
+sequenceDiagram
+    participant User
+    participant Shell
+    participant Devbox
+    participant Setup as plugins/nvim/setup.sh
+    participant Nvim
+    
+    User->>Shell: cd project/
+    Shell->>Devbox: direnv allow / devbox shell
+    Devbox->>Devbox: Install Packages (if missing)
+    Devbox->>Shell: Execute init_hook
+    Shell->>Setup: source setup.sh
+    Setup->>Setup: Export XDG_CONFIG_HOME="$PWD/.config"
+    Setup->>Setup: Check for init.lua
+    alt init.lua missing
+        Setup->>Setup: Copy plugins/nvim/init.lua -> .config/nvim/
+    end
+    
+    User->>Shell: nvim
+    Shell->>Nvim: Launch (Isolated Environment)
+    Nvim->>Nvim: Load plugins from $PWD/.local/share
+```
 
-# Run this command to generate it automatically:
+## 🛠 Usage
 
-# devbox generate direnv
+### Prerequisites
+- [Devbox](https://www.jetpack.io/devbox/docs/installing_devbox/)
+- [Direnv](https://direnv.net/) (Recommended)
 
-eval "$(devbox generate direnv --print-envrc)"
+### Quick Start
+1.  **Clone the repo** and `cd` into it.
+2.  **Initialize**:
+    ```bash
+    devbox install
+    direnv allow  # If using direnv
+    # OR
+    devbox shell
+    ```
+3.  **Run NeoVim**:
+    ```bash
+    nvim
+    ```
+    You will see LazyVim install plugins into `.local/share/nvim`. Nothing is touched in your global home directory.
 
-### 4. Activate Automation
+### Scripts
+The plugin provides helper scripts accessible via `devbox run`:
 
-Run this once inside the project folder to link everything together:
-devbox generate direnv && direnv allow
-
-### 5. Verification
-
-1. Exit and return to the folder: `cd .. && cd -`
-2. Check Path: `which nvim` (Should point to .devbox/nix/profile/...)
-3. Check UI: Press `Ctrl + R` (Should open Atuin search)
+- `devbox run nvim-health`: Checks the health of the environment and verifies configuration.
+- `devbox run nvim-update`: Updates plugins headless.
