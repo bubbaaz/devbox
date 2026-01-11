@@ -1,94 +1,133 @@
-# Devbox Development Environment
+# Portable Rust & NeoVim Environment
 
-This project uses [Devbox](https://www.jetpack.io/devbox) to create a reproducible, portable, and isolated development environment. It features a custom **Project-Local NeoVim** setup, ensuring that your editor configuration is consistent and contained entirely within this directory.
+This project uses [Devbox](https://www.jetpack.io/devbox) to create a **fully isolated, reproducible, and portable** development environment.
+
+It goes beyond standard package installation by virtualizing your entire shell experience. When you enter this environment, you get a custom Zsh, a premium Starship prompt, and a pre-configured NeoVim IDE—all without touching your host machine's configuration files (`~/.zshrc`, `~/.config/nvim`, etc.).
+
+---
 
 ## 🏗 Architecture
 
-The project is split into two main responsibilities: **Provisioning** (installing tools) and **Configuration** (setting them up).
+The environment is built on a "Provisioning vs. Configuration" split, ensuring that tools are not just installed, but correctly set up for isolation.
 
 ```mermaid
 graph TD
     subgraph "Provisioning (devbox.json)"
-        Devbox[Devbox] -->|Installs| Packages[Packages\n(neovim, git, nodejs, etc.)]
-        Devbox -->|Includes| Plugin[plugins/nvim/plugin.json]
+        Devbox[Devbox] -->|Installs| Core[Core Tools]
+        Core --> Rust[Rust Toolchain\n(rustc, cargo, ra)]
+        Core --> ShellPkg[Shell Utils\n(zsh, starship, coreutils)]
+        Core --> Editor[Editor\n(neovim, lua, etc.)]
+        
+        Devbox -->|Includes| ShellPlugin[plugins/shell/]
+        Devbox -->|Includes| NvimPlugin[plugins/nvim/]
     end
 
-    subgraph "Configuration (plugins/nvim/)"
-        Plugin -->|Defines| Hooks[Shell Hooks & Scripts]
-        Hooks -->|Executes| Setup[setup.sh]
-        Setup -->|Sets| EnvVars[XDG Environment Vars]
-        Setup -->|Deploys| Config[init.lua]
+    subgraph "Shell Isolation (plugins/shell/)"
+        ShellPlugin -->|Sets| ZDOTDIR["ZDOTDIR=$PWD/.shell"]
+        ZDOTDIR -->|Loads| LocalRc[.shell/.zshrc]
+        LocalRc -->|Sources| SetupSh[plugins/shell/setup.sh]
+        SetupSh -->|Configures| Starship[Starship Prompt]
+        SetupSh -->|Configures| Aliases[Colors & Aliases]
     end
 
-    EnvVars -->|Isolates| Nvim[NeoVim Instance]
-    Config -->|Configures| Nvim
+    subgraph "Editor Isolation (plugins/nvim/)"
+        NvimPlugin -->|Sets| XDG[XDG_CONFIG_HOME]
+        XDG -->|Points to| LocalConfig[.config/nvim/]
+        LocalConfig -->|Bootstraps| LazyVim[LazyVim Distro]
+    end
 ```
 
-### 1. `devbox.json` (The Provisioner)
-Located at the project root, this file defines the **tools** required for the project.
-- **Packages**: Lists `neovim`, `git`, `ripgrep`, `nodejs`, etc.
-- **Includes**: Imports `./plugins/nvim/plugin.json` to bring in the NeoVim-specific logic.
+### Key Technologies
+1.  **Devbox**: Manages binary packages via Nix.
+2.  **ZDOTDIR Isolation**: We override the `ZDOTDIR` environment variable to point to `.shell/`. This forces Zsh to ignore your global `~/.zshrc` and load ours instead, granting us total control over the shell environment.
+3.  **Project-Local Home**: NeoVim and other tools are configured to see this directory (specifically `.config` and `.local`) as their "home", preventing conflicts with your system settings.
 
-### 2. `plugins/nvim/` (The Configurator)
-This directory acts as a local Devbox plugin. It encapsulates all the logic needed to verify and configure the editor.
-- **`plugin.json`**: Defines shell hooks (`init_hook`) and convenience scripts (`nvim-health`).
-- **`setup.sh`**: Runs when you enter the shell. It:
-    1.  Sets `XDG_CONFIG_HOME` and `XDG_DATA_HOME` to local folders (`.config/`, `.local/`).
-    2.  Ensures required directories exist.
-    3.  Copies the bootstrap `init.lua` if it's missing.
-- **`init.lua`**: The entry point for the NeoVim configuration (bootstrapping `lazy.nvim` and `LazyVim`).
+---
 
-## 🚀 How It Works
+## 🚀 Features
 
-When you enter the directory (via `cd` with `direnv` or `devbox shell`), the following sequence occurs:
+### 🦀 Rust Toolchain
+- **Full Stack**: Includes `rustc`, `cargo`, and `rust-analyzer` (latest stable).
+- **Zero Config**: Ready to compile and analyze code immediately.
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Shell
-    participant Devbox
-    participant Setup as plugins/nvim/setup.sh
-    participant Nvim
-    
-    User->>Shell: cd project/
-    Shell->>Devbox: direnv allow / devbox shell
-    Devbox->>Devbox: Install Packages (if missing)
-    Devbox->>Shell: Execute init_hook
-    Shell->>Setup: source setup.sh
-    Setup->>Setup: Export XDG_CONFIG_HOME="$PWD/.config"
-    Setup->>Setup: Check for init.lua
-    alt init.lua missing
-        Setup->>Setup: Copy plugins/nvim/init.lua -> .config/nvim/
-    end
-    
-    User->>Shell: nvim
-    Shell->>Nvim: Launch (Isolated Environment)
-    Nvim->>Nvim: Load plugins from $PWD/.local/share
-```
+### 🐚 The "Premium" Shell
+A fully configured Zsh environment that looks and feels the same on macOS, Linux, or WSL.
+- **Starship Prompt**: A high-performance, information-rich prompt showing git status, Rust version, and package info.
+- **Smart Autocomplete**: Case-insensitive matching, menu selection (`TAB` to cycle), and path completion.
+- **Visuals**: `ls`, `grep`, and `diff` are aliased with proper color flags outputting standard GNU/BSD colors.
+- **Isolation**: Your aliases, history, and variables stay in this folder. `exit` returns you to your pristine host shell.
+
+### 📝 NeoVim IDE
+- **LazyVim Base**: A heavily optimized configuration framework.
+- **Self-Contained**: Plugins are installed to `.local/share/nvim` inside this project.
+- **Headless Bootstrap**: Automatically installs itself on the first run.
+
+---
 
 ## 🛠 Usage
 
-### Prerequisites
-- [Devbox](https://www.jetpack.io/devbox/docs/installing_devbox/)
-- [Direnv](https://direnv.net/) (Recommended)
+### 1. Enter the Environment
+Running `devbox shell` is the **only** command you need. It handles the "handoff" from your system shell to our isolated Zsh.
 
-### Quick Start
-1.  **Clone the repo** and `cd` into it.
-2.  **Initialize**:
+```bash
+# Enter the magic zone
+devbox shell
+```
+
+> **Note**: You will see a "🚀 Virtualized Devbox Shell Active" message confirmation.
+
+### 2. Work on Code
+Once inside, you have access to all tools:
+
+```bash
+# Run Rust code
+cargo run
+
+# Edit files (using the isolated NeoVim)
+nvim main.rs
+
+# Use the shell
+ls -la  # Colored output
+```
+
+### 3. Exit
+To return to your normal host system:
+
+```bash
+exit
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### "My prompt didn't load!"
+If you see a plain prompt or missing colors, it usually means the terminal was detected as "dumb" or the initialization hook was skipped.
+*   **Fix**: Run `exit` and `devbox shell` again. We explicitly force `TERM=xterm-256color` and inject the prompt string to prevent this.
+
+### "Where is my history?"
+Shell history is saved to `.devbox/zsh_history`. It is specific to this project, so commands you run here won't clutter your main history.
+
+---
+
+## ⚡ Reproducing on Another Machine
+
+This environment is designed to be 100% portable. To set it up on a new laptop or server:
+
+1.  **Install Devbox**:
     ```bash
-    devbox install
-    direnv allow  # If using direnv
-    # OR
+    curl -fsSL https://get.jetpack.io/devbox | bash
+    ```
+
+2.  **Clone this Repository**:
+    ```bash
+    git clone <your-repo-url> devbox-rust
+    cd devbox-rust
+    ```
+
+3.  **Launch**:
+    ```bash
     devbox shell
     ```
-3.  **Run NeoVim**:
-    ```bash
-    nvim
-    ```
-    You will see LazyVim install plugins into `.local/share/nvim`. Nothing is touched in your global home directory.
 
-### Scripts
-The plugin provides helper scripts accessible via `devbox run`:
-
-- `devbox run nvim-health`: Checks the health of the environment and verifies configuration.
-- `devbox run nvim-update`: Updates plugins headless.
+**That's it.** Devbox will automatically download the pinned versions of Rust, NeoVim, Zsh, and Starship. You will be dropped into the exact same shell environment with the exact same configuration as your main machine.

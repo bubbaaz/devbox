@@ -1,0 +1,9 @@
+{
+    "name": "shell-config",
+    "version": "0.1.0",
+    "description": "Project-local shell configuration (Zsh, Starship, Aliases)",
+    "packages": [],
+    "shell": {
+        "scripts": {}
+    }
+}

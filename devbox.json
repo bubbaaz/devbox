@@ -1,7 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/main/.schema/devbox.schema.json",
   "include": [
-    "./plugins/nvim/plugin.json"
+    "./plugins/nvim/plugin.json",
+    "./plugins/shell/plugin.json"
   ],
   "packages": [
     "neovim@latest",
@@ -19,10 +20,20 @@
     "python3@latest",
     "atuin@latest",
     "lolcat@latest",
-    "tmux@latest"
+    "tmux@latest",
+    "rustc@latest",
+    "cargo@latest",
+    "rust-analyzer@latest",
+    "zsh@latest",
+    "starship@latest",
+    "coreutils@latest"
   ],
   "shell": {
-    "init_hook": [],
+    "init_hook": [
+      "export ZDOTDIR=\"$DEVBOX_PROJECT_ROOT/.shell\"",
+      "export TERM=xterm-256color",
+      "export CLICOLOR=1"
+    ],
     "scripts": {}
   }
 }
