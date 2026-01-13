@@ -27,14 +27,19 @@ The project uses a "Provisioning vs. Configuration" pattern to achieve isolation
     *   Sets `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, and `XDG_CACHE_HOME` to local directories within the project (`.config/`, `.local/`, `.cache/`).
     *   Bootstraps a LazyVim configuration automatically on first run.
 
+4.  **Terminal Multiplexer Isolation (`plugins/tmux/`)**:
+    *   Sets up a project-local `tmux.conf`.
+    *   Links configuration to `.config/tmux/tmux.conf` via `XDG_CONFIG_HOME`.
+
 ---
 
 ## 🔑 Key Files
 
-*   **`devbox.json`**: The central manifest. Lists packages (e.g., `rustc`, `cargo`, `neovim`, `bat`) and includes plugins.
+*   **`devbox.json`**: The central manifest. Lists packages (e.g., `rustc`, `cargo`, `neovim`, `bat`, `tmux`) and includes plugins.
 *   **`.shell/.zshrc`**: The entry point for the isolated shell. It sets up the terminal colors and sources the setup script.
 *   **`plugins/shell/setup.sh`**: Defines aliases (`ls`, `grep`), history settings, and Starship initialization.
 *   **`plugins/nvim/setup.sh`**: Redirects Neovim's config paths to the project folder and bootstraps `init.lua` if missing.
+*   **`plugins/tmux/tmux.conf`**: The project-specific tmux configuration.
 *   **`.config/starship.toml`**: The configuration for the shell prompt.
 
 ---

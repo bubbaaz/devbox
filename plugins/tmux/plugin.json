@@ -1,0 +1,11 @@
+{
+    "name": "tmux-config",
+    "version": "0.1.0",
+    "description": "Project-local tmux configuration",
+    "packages": [],
+    "shell": {
+        "init_hook": [
+            "source ./plugins/tmux/setup.sh"
+        ]
+    }
+}

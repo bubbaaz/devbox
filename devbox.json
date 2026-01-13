@@ -2,7 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/main/.schema/devbox.schema.json",
   "include": [
     "./plugins/nvim/plugin.json",
-    "./plugins/shell/plugin.json"
+    "./plugins/shell/plugin.json",
+    "./plugins/tmux/plugin.json"
   ],
   "packages": [
     "atuin@latest",
