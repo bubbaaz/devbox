@@ -2,3 +2,4 @@
 .devbox/
 .local/
 nvim.log
+.shell/.zsh_history
