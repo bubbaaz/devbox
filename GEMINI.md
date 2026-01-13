@@ -57,6 +57,7 @@ devbox shell
 *   All tools (Rust, Nvim, etc.) are now available in your PATH.
 
 ### Working with Code
+*   **Multiplexer**: Run `tmux` to enter the project-local tmux session. This is highly recommended as the **Starship prompt is most stable within Tmux**.
 *   **Build/Run**: `cargo run` / `cargo build`
 *   **Edit**: `nvim <file>` (Uses the isolated LazyVim config)
 *   **Shell**: Standard Zsh commands, with syntax highlighting and autosuggestions enabled.

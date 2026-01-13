@@ -104,6 +104,6 @@ Simply type `exit` to return to your normal host shell.
 
 *   **Strange characters or boxes?** This usually means your terminal doesn't have a [Nerd Font](https://www.nerdfonts.com/) installed. You can fix this by running `export DEVBOX_NO_NERD_FONTS=1` before (or inside) the shell to switch to the simplified ASCII prompt.
 
-*   **Prompt not loading?** Run `exit` and `devbox shell` again. We force `TERM=xterm-256color` to ensure compatibility. If Starship continues to fail, the shell will automatically use its native Zsh fallback prompt.
+*   **Prompt not loading or behaving weirdly?** Starship can occasionally be unpredictable in standalone Zsh sessions. For the most stable experience, launch **Tmux** by running `tmux` after entering the shell. Tmux provides a more consistent terminal environment where Starship works reliably.
 
 *   **Where is my history?** History is managed by Atuin in `.local/share/atuin/history.db`.

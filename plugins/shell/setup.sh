@@ -19,6 +19,7 @@ function set_fallback_prompt() {
 }
 
 # Determine which Starship config to use
+# Note: Starship can be unpredictable in standalone Zsh; Tmux is recommended for stability.
 # If DEVBOX_NO_NERD_FONTS is set, or we can't detect a modern terminal
 if [[ -n "$DEVBOX_NO_NERD_FONTS" ]]; then
   export STARSHIP_CONFIG="$DEVBOX_PROJECT_ROOT/.config/starship.simple.toml"

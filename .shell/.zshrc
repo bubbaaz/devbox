@@ -50,4 +50,5 @@ fi
 # Visual confirmation (Unless in tmux or subshell to avoid clutter)
 if [[ -z "$TMUX" ]]; then
   echo "🚀 Virtualized Devbox Shell Active"
+  echo "💡 Hint: Run 'tmux' for the most stable Starship prompt experience."
 fi
