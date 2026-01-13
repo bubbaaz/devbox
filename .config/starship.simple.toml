@@ -1,0 +1,65 @@
+# starship.simple.toml (No Nerd Font icons, high compatibility)
+
+format = """
+$username\n$hostname\n$directory\n$git_branch\n$git_state\n$git_status\n$nix_shell\n$rust\n$package\n$python\n$lua\n$nodejs\n$memory_usage\n$battery\n$time\n$cmd_duration\n$line_break\n$character"""
+
+[directory]
+style = "bold blue"
+truncate_to_repo = true
+truncation_length = 3
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[x](bold red)"
+
+[git_branch]
+symbol = "branch "
+style = "bold purple"
+
+[nix_shell]
+symbol = "nix "
+format = "via [$symbol$state]($style) "
+
+[rust]
+symbol = "rust "
+format = "via [$symbol($version )]($style)"
+
+[python]
+symbol = "py "
+format = "via [$symbol($version )(($virtualenv) )]($style)"
+
+[nodejs]
+symbol = "node "
+format = "via [$symbol($version )]($style)"
+
+[lua]
+symbol = "lua "
+format = "via [$symbol($version )]($style)"
+
+[cmd_duration]
+min_time = 500
+format = "took [$duration]($style) "
+
+[battery]
+full_symbol = "bat "
+charging_symbol = "charging "
+discharging_symbol = "low "
+format = "[$symbol$percentage]($style) "
+disabled = false
+
+[[battery.display]]
+threshold = 100
+style = "bold green"
+
+[memory_usage]
+disabled = false
+threshold = -1
+symbol = "mem "
+format = "via $symbol[${ram}( | ${swap})]($style) "
+style = "bold dimmed white"
+
+[time]
+disabled = false
+format = "at [$time]($style) "
+time_format = "%T"
+style = "bold yellow"

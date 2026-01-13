@@ -44,7 +44,9 @@ graph TD
 
 ### 🐚 The "Premium" Shell
 A Zsh environment that looks and feels identical on macOS, Linux, or WSL.
-- **Starship Prompt**: High-performance, contextual prompt (Git, Rust, versions).
+- **Starship Prompt**: High-performance, contextual prompt.
+  - **Compatibility Mode**: If icons look like boxes, set `export DEVBOX_NO_NERD_FONTS=1` to use the ASCII-only prompt.
+  - **Native Fallback**: If Starship fails to load, the shell automatically reverts to a robust, color-coded native Zsh prompt.
 - **Atuin**: Replace `Ctrl-R` with a powerful, searchable UI for your project history.
 - **Syntax Highlighting**: Real-time highlighting as you type.
 - **Isolated History**: Commands run here stay here—stored in `.local/share/atuin/`.
@@ -98,5 +100,10 @@ Simply type `exit` to return to your normal host shell.
 
 ## 🔧 Troubleshooting
 
-*   **Prompt not loading?** Run `exit` and `devbox shell` again. We force `TERM=xterm-256color` to ensure compatibility.
+
+
+*   **Strange characters or boxes?** This usually means your terminal doesn't have a [Nerd Font](https://www.nerdfonts.com/) installed. You can fix this by running `export DEVBOX_NO_NERD_FONTS=1` before (or inside) the shell to switch to the simplified ASCII prompt.
+
+*   **Prompt not loading?** Run `exit` and `devbox shell` again. We force `TERM=xterm-256color` to ensure compatibility. If Starship continues to fail, the shell will automatically use its native Zsh fallback prompt.
+
 *   **Where is my history?** History is managed by Atuin in `.local/share/atuin/history.db`.
