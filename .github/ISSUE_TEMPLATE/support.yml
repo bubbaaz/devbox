@@ -1,0 +1,16 @@
+name: "💬 Question / Support"
+description: "Need help using or configuring the environment?"
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: "What can we help you with?"
+      description: "Please provide as much detail as possible so we can help you."
+    validations:
+      required: true
+  - type: textarea
+    id: attempt
+    attributes:
+      label: "What have you tried so far?"
+      description: "Briefly describe any steps you've taken to resolve the issue yourself."
